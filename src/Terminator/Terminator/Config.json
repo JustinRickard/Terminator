@@ -1,0 +1,40 @@
+{
+  "baseDirectory": "$HOME\\Code\\RedRiver",
+  "launchConfigGroups": [
+    {
+      "name": "Cinnamon",
+      "launchConfigs": [
+        {
+          "name": "Cinnamon",
+          "programType": "Powershell",
+          "path": "Cinnamon\\cinnamon"
+        },
+        {
+          "name": "Docs",
+          "programType": "Powershell",
+          "path": "Cinnamon\\apps\\docs"
+        }
+      ]
+    },
+    {
+      "name": "Prism",
+      "launchConfigs": [
+        {
+          "name": "Prism",
+          "programType": "Powershell",
+          "path": "diamond-prism\\src\\Prism"
+        },
+        {
+          "name": "Prism - Test Harness",
+          "programType": "Powershell",
+          "path": "diamond-prism\\frontend\\testHarness"
+        },
+        {
+          "name": "Prism - Admin",
+          "programType": "Powershell",
+          "path": "diamond-prism\\frontend\\admin"
+        }
+      ]
+    }
+  ]
+}
