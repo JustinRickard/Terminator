@@ -67,13 +67,25 @@ namespace Terminator
 
             var group = _config.LaunchConfigGroups.FirstOrDefault();
 
+            
+
+            this.Controls.Add(GetGroupDropdown());
+
+            InitializeLaunchPanel(group);
+
+            this.Controls.Add(launchPanel);
+        }
+
+        private ComboBox GetGroupDropdown()
+        {
             var groupDropdown = new ComboBox();
             groupDropdown.Name = "dd_group";
             groupDropdown.DisplayMember = "Name";
             groupDropdown.ValueMember = "Name";
-            groupDropdown.Font = new Font("Eras Demi ITC", 16, FontStyle.Regular);
-            groupDropdown.ForeColor = Color.FromArgb(0, 255, 255, 255);
-            groupDropdown.BackColor = Color.Azure;
+            groupDropdown.Font = new Font("Eras Demi ITC", 14, FontStyle.Regular);
+            groupDropdown.ForeColor = Color.FromArgb(0, 45, 45, 45);
+            groupDropdown.BackColor = Color.LightGreen;
+            groupDropdown.Location = new Point(5, 5);
 
             foreach (var groupToAdd in _config.LaunchConfigGroups)
             {
@@ -82,11 +94,7 @@ namespace Terminator
             groupDropdown.SelectedValue = _config.LaunchConfigGroups.FirstOrDefault();
             groupDropdown.SelectedIndexChanged += new EventHandler(SelectGroup_Click);
 
-            this.Controls.Add(groupDropdown);
-
-            InitializeLaunchPanel(group);           
-
-            this.Controls.Add(launchPanel);
+            return groupDropdown;
         }
 
         private void InitializeLaunchPanel(LaunchConfigGroup group)
