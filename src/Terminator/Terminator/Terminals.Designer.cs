@@ -16,8 +16,10 @@ namespace Terminator
         private Config _config;
         private Dictionary<string, LaunchConfig> _buttonNameLaunchConfigMappings;
         private ComboBox _groupDropdown;
-        private Label _groupTitle;
-        private List<Button> _launchButtons;
+        private Panel launchPanel;
+        private int panelX = 5, panelY = 30;
+        private const int buttonWidth = 100, buttonHeight = 100;
+        private const string launchPanelName = "launch_panel";
 
         /// <summary>
         /// Required designer variable.
@@ -65,43 +67,55 @@ namespace Terminator
 
             var group = _config.LaunchConfigGroups.FirstOrDefault();
 
-            int x = 5, y = 10;
-            int buttonWidth = 100, buttonHeight = 100;
+            var groupDropdown = new ComboBox();
+            groupDropdown.Name = "dd_group";
+            groupDropdown.DisplayMember = "Name";
+            groupDropdown.ValueMember = "Name";
+            groupDropdown.Font = new Font("Eras Demi ITC", 16, FontStyle.Regular);
+            groupDropdown.ForeColor = Color.FromArgb(0, 255, 255, 255);
+            groupDropdown.BackColor = Color.Azure;
 
-            var _groupDropdown = new ComboBox();
-            _groupDropdown.Height = 40;
-            _groupDropdown.Name = "dd_group";
-            _groupDropdown.DisplayMember = "Name";
-            _groupDropdown.ValueMember = "Name";
-            foreach(var groupToAdd in _config.LaunchConfigGroups)
+            foreach (var groupToAdd in _config.LaunchConfigGroups)
             {
-                _groupDropdown.Items.Add(groupToAdd);
+                groupDropdown.Items.Add(groupToAdd);
             }
-            _groupDropdown.SelectedValue = _config.LaunchConfigGroups.FirstOrDefault();
-            _groupDropdown.SelectedIndexChanged += new EventHandler(SelectGroup_Click);
+            groupDropdown.SelectedValue = _config.LaunchConfigGroups.FirstOrDefault();
+            groupDropdown.SelectedIndexChanged += new EventHandler(SelectGroup_Click);
+
+            this.Controls.Add(groupDropdown);
+
+            InitializeLaunchPanel(group);           
+
+            this.Controls.Add(launchPanel);
+        }
+
+        private void InitializeLaunchPanel(LaunchConfigGroup group)
+        {
+            this.Controls.RemoveByKey(launchPanelName);
+
+            launchPanel = new Panel();
+            launchPanel.Name = launchPanelName;
+            launchPanel.Location = new Point(panelX, panelY);
+
+            int x = 0, y = 0;
+
+            
 
             y += 30;
 
-            this.Controls.Add(_groupDropdown);
+            launchPanel.Controls.AddRange(GetButtons(group, ref x, ref y));
+            launchPanel.Height = 500;
+        }
 
-
-            // Add group box
-            _groupTitle = new Label();
-            _groupTitle.Text = group.Name;
-            _groupTitle.Location = new System.Drawing.Point(x, y);
-            _groupTitle.Font = new Font("Eras Demi ITC", 16, FontStyle.Bold);
-            _groupTitle.ForeColor = Color.FromArgb(0, 145, 12, 12);
-            _groupTitle.Width = 300;
-            this.Controls.Add(_groupTitle);
-            y += 30;
-
-            _launchButtons = new List<Button>();
+        private Button[] GetButtons(LaunchConfigGroup group, ref int x, ref int y)
+        {
+            var buttons = new List<Button>();
 
             foreach (var launch in group.LaunchConfigs)
             {
                 var b = new Button();
                 b.Location = new System.Drawing.Point(x, y);
-                b.Name = $"button_{group.Name.Replace(" ","")}_{launch.Name.Replace(" ", "")}";
+                b.Name = $"button_{group.Name.Replace(" ", "")}_{launch.Name.Replace(" ", "")}";
                 b.Text = launch.Name;
                 b.Size = new System.Drawing.Size(buttonWidth, buttonHeight);
                 b.Padding = new Padding(1);
@@ -111,15 +125,20 @@ namespace Terminator
                 b.BackgroundImage = GetLaunchBgImage(launch.ProgramType);
                 b.BackgroundImageLayout = ImageLayout.Stretch;
 
-                _buttonNameLaunchConfigMappings.Add(b.Name, launch);
+                _buttonNameLaunchConfigMappings.TryAdd(b.Name, launch);
 
                 b.Click += GetEventHandler(launch.ProgramType);
 
-                _launchButtons.Add(b);
+                buttons.Add(b);
                 y += buttonHeight + 5;
             }
 
-            this.Controls.AddRange(_launchButtons.ToArray());
+            return buttons.ToArray();
+        }
+
+        private void UpdateLaunchPanel(LaunchConfigGroup group)
+        {
+
         }
 
         private EventHandler GetEventHandler(ProgramType type)
@@ -136,14 +155,12 @@ namespace Terminator
         private void SelectGroup_Click(object sender, EventArgs e)
         {
             var combo = (ComboBox)sender;
-            var selectedGroup = (LaunchConfigGroup)combo.SelectedItem;
+            var group = (LaunchConfigGroup)combo.SelectedItem;
+            int x = 5, y = 10;
 
-            UpdateItemsForGroup(selectedGroup);
-        }
-
-        private void UpdateItemsForGroup(LaunchConfigGroup group)
-        {
-            _groupTitle.Text = group.Name;
+            launchPanel.Controls.Clear();
+            launchPanel.Controls.AddRange(GetButtons(group, ref x, ref y));
+            launchPanel.Update();
         }
 
         private void LaunchPowershell_Click(object sender, EventArgs e)
